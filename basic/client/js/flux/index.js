@@ -34,6 +34,14 @@ export const removeTodoAction = (todoId) => {
   };
 };
 
+const CHECK_TODO_ACTION_TYPE = "check todo from server";
+export const checkTodoAction = (todo) => {
+  return {
+    type: CHECK_TODO_ACTION_TYPE,
+    payload: todo,
+  };
+};
+
 const CLEAR_ERROR = "Clear error from state";
 export const clearError = () => ({
   type: CLEAR_ERROR,
@@ -75,7 +83,7 @@ const reducer = async (prevState, { type, payload }) => {
       }
     }
     case REMOVE_TODO_ACTION_TYPE: {
-      const url = "http://localhost:3000/todo/" + payload;
+      const url = api + "/" + payload;
       try {
         await fetch(url, {
           method: "DELETE",
@@ -86,6 +94,26 @@ const reducer = async (prevState, { type, payload }) => {
         if (index === -1) return;
         const nextTodoList = [...prevState.todoList];
         nextTodoList.splice(index, 1);
+        return { todoList: nextTodoList, error: null };
+      } catch (err) {
+        console.error("問題発生! %o", err);
+        return { ...prevState, error: err };
+      }
+    }
+    case CHECK_TODO_ACTION_TYPE: {
+      const url = api + "/" + payload.id;
+      const body = JSON.stringify(payload);
+      try {
+        await fetch(url, {
+          method: "PATCH",
+          body: body,
+        });
+        const index = prevState.todoList.findIndex(
+          (todo) => todo.id === payload.id
+        );
+        if (index === -1) return;
+        let nextTodoList = [...prevState.todoList];
+        nextTodoList.done = !nextTodoList.done;
         return { todoList: nextTodoList, error: null };
       } catch (err) {
         console.error("問題発生! %o", err);

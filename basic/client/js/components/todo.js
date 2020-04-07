@@ -1,4 +1,4 @@
-import { removeTodoAction } from "../flux/index.js";
+import { removeTodoAction, checkTodoAction } from "../flux/index.js";
 import store from "../store.js";
 
 class Todo {
@@ -13,6 +13,13 @@ class Todo {
     const removeButton = this.element.querySelector(".todo-remove-button");
     removeButton.addEventListener("click", () => {
       store.dispatch(removeTodoAction(this.props.id));
+    });
+  }
+
+  checked() {
+    const checkButton = this.element.querySelector(".todo-toggle");
+    checkButton.addEventListener("click", () => {
+      store.dispatch(checkTodoAction(this.props));
     });
   }
 
@@ -34,6 +41,7 @@ class Todo {
     `;
     this.parent.appendChild(this.element);
     this.mount();
+    this.checked();
   }
 }
 
