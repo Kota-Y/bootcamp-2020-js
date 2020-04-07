@@ -26,6 +26,14 @@ export const createAddTodoAction = (todo) => ({
   payload: todo,
 });
 
+const REMOVE_TODO_ACTION_TYPE = "remove todo from server";
+export const removeTodoAction = (todoId) => {
+  return {
+    type: REMOVE_TODO_ACTION_TYPE,
+    paylaod: todoId,
+  };
+};
+
 const CLEAR_ERROR = "Clear error from state";
 export const clearError = () => ({
   type: CLEAR_ERROR,
@@ -64,6 +72,16 @@ const reducer = async (prevState, { type, payload }) => {
         return { todoList: [...prevState.todoList, resp], error: null };
       } catch (err) {
         return { ...prevState, error: err };
+      }
+    }
+    case REMOVE_TODO_ACTION_TYPE: {
+      const url = "http://localhost:3000/todo/" + payload;
+      try {
+        await fetch(url, {
+          method: "DELETE",
+        });
+      } catch (err) {
+        console.error("問題発生! %o", err);
       }
     }
     case CLEAR_ERROR: {
