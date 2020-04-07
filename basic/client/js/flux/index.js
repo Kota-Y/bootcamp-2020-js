@@ -30,7 +30,7 @@ const REMOVE_TODO_ACTION_TYPE = "remove todo from server";
 export const removeTodoAction = (todoId) => {
   return {
     type: REMOVE_TODO_ACTION_TYPE,
-    paylaod: todoId,
+    payload: todoId,
   };
 };
 
@@ -80,8 +80,16 @@ const reducer = async (prevState, { type, payload }) => {
         await fetch(url, {
           method: "DELETE",
         });
+        const index = prevState.todoList.findIndex(
+          (todo) => todo.id === payload
+        );
+        if (index === -1) return;
+        const nextTodoList = [...prevState.todoList];
+        nextTodoList.splice(index, 1);
+        return { todoList: nextTodoList, error: null };
       } catch (err) {
         console.error("問題発生! %o", err);
+        return { ...prevState, error: err };
       }
     }
     case CLEAR_ERROR: {
